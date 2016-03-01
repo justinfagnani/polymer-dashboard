@@ -20811,7 +20811,7 @@ this._requestUntriaged();
 } else {
 var response = JSON.parse(xhr.responseText);
 this._filterAndAdd(response, null, false, false, repo.path, 'all');
-this._filterAndAdd(response, /^Priority:\d/i, true, false, repo.path, 'untriaged');
+this._filterAndAdd(response, /^Priority:/i, true, false, repo.path, 'untriaged');
 this._filterAndAdd(response, /^Priority: Critical/i, false, false, repo.path, 'p0');
 this._filterAndAdd(response, /^Priority: High/i, false, false, repo.path, 'p1');
 this._filterAndAdd(response, /^Priority: Medium/i, false, false, repo.path, 'p2');
