@@ -413,12 +413,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <template is="dom-repeat" items="{{maintainer.repos}}">
         <div class="row repo">
           <div class="name "><a target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}">{{item.name}}</a></div>
-          <div class="count"><a target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aopen+-label%3A%22p0+-+critical%22++-label%3A%22p1+-+backlog%22++-label%3A%22p2+-+icebox%22+">
+          <div class="count"><a target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aopen+-label%3A%22Priority:+Critical%22++-label%3A%22Priority:+High%22++-label%3A%22Priority:+Medium%22++-label%3A%22Priority:+Low%22+">
             {{item.untriaged.length}}</a></div>
-          <div class="count"><a class="p0" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aopen+label%3A%22p0+-+critical%22">{{item.p0.length}}</a></div>
-          <div class="count"><a class="p1" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aopen+label%3A%22p1+-+backlog%22">{{item.p1.length}}</a></div>
-          <div class="count"><a class="p2" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aopen+label%3A%22p2+-+icebox%22">{{item.p2.length}}</a></div>
-          <div class="count"><a class="p3" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aopen+label%3A%22p2+-+icebox%22">{{item.p3.length}}</a></div>
+          <div class="count"><a class="p0" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aopen+label%3A%22Priority:+Critical%22">{{item.p0.length}}</a></div>
+          <div class="count"><a class="p1" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aopen+label%3A%22Priority:+High%22">{{item.p1.length}}</a></div>
+          <div class="count"><a class="p2" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aopen+label%3A%22Priority:+Medium%22">{{item.p2.length}}</a></div>
+          <div class="count"><a class="p3" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&amp;q=is%3Aissue+is%3Aopen+label%3A%22Priority:+Low%22">{{item.p3.length}}</a></div>
           <div class="count"><a class="pr" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/pulls?utf8=%E2%9C%93&amp;q=is%3Apr+is%3Aopen">{{item.prs.length}}</a></div>
           <div class="count"><a target="_blank" href="https://travis-ci.org/{{item.organization}}/{{item.name}}"><img src="https://travis-ci.org/{{item.organization}}/{{item.name}}.svg?branch=master"></a></div>
         </div>
