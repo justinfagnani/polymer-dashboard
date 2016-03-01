@@ -20661,7 +20661,7 @@ console.error('localStorage could not be saved. Safari incoginito mode?', ex);
 Polymer({
 is: 'pd-app',
 properties: {
-clientId: { value: '638152944882-u4h50pu74fgnbovm5erc639a39rt8pd6.apps.googleusercontent.com' },
+clientId: { value: '211830188302-qi9uojmdmt0d7entjmk663bo7a6vc9g0.apps.googleusercontent.com' },
 options: {
 value: function () {
 return {
