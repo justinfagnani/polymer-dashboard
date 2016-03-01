@@ -61,6 +61,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     .p0 { color: var(--paper-pink-500) !important; }
     .p1 { color: var(--paper-orange-500) !important; }
     .p2 { color: var(--paper-indigo-500) !important; }
+    .p3 { color: var(--paper-indigo-500) !important; }
     .pr { color: var(--paper-green-500) !important; }
 
     .tldr {
@@ -138,7 +139,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template strip-whitespace>
     <style include="pd-shared-styles"></style>
     <paper-toolbar>
-      <span class="title">Polymer Elements Issues</span>
+      <span class="title">Polymer Tools Issues</span>
 
       <div class="horizontal" hidden$="[[!_shouldShowResults(googleUser,githubUser)]]">
         <paper-checkbox on-tap="_toggleTeams" id="teamsOn" checked>Expand teams</paper-checkbox>
@@ -172,15 +173,19 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         </div>
         <div class="tldr">
           <div class="value p0">{{all.p0.length}}</div>
-          <div class="title">P0 issues</div>
+          <div class="title">Critical issues</div>
         </div>
         <div class="tldr">
           <div class="value p1">{{all.p1.length}}</div>
-          <div class="title">P1 issues</div>
+          <div class="title">High issues</div>
         </div>
         <div class="tldr">
           <div class="value p2">{{all.p2.length}}</div>
-          <div class="title">P2 issues</div>
+          <div class="title">Medium issues</div>
+        </div>
+        <div class="tldr">
+          <div class="value p3">{{all.p3.length}}</div>
+          <div class="title">Low issues</div>
         </div>
         <div class="tldr">
           <div class="value pr">{{all.prs.length}}</div>
@@ -202,9 +207,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         <div class="row header">
           <div class="name"></div>
           <div class="count">Untriaged</div>
-          <div class="count">P0</div>
-          <div class="count">P1</div>
-          <div class="count">P2</div>
+          <div class="count">Critical</div>
+          <div class="count">High</div>
+          <div class="count">Medium</div>
+          <div class="count">Low</div>
           <div class="count">PR's</div>
           <div class="count"></div>
         </div>
@@ -218,7 +224,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <google-sheets id="sheet"
       client-id="{{clientId}}"
-      key="1m0SleaDfRTPzDvlnInip9x4FXT6O98M2W8jwZyHmNp8" tab-id="1" rows="{{rows}}">
+      key="1aRMN0S0SfW66xsnUlsdeTS0--PA44SW3wuBBD9cEEGk" tab-id="1" rows="{{rows}}">
     </google-sheets>
 
     <google-signin-aware
@@ -229,7 +235,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </google-signin-aware>
 
     <firebase-auth provider="github" id="githubAuth"
-      location="https://polymer-demos.firebaseio.com"
+      location="https://popping-inferno-1221.firebaseio.com"
       user="{{githubUser}}">
     </firebase-auth>
 
@@ -316,8 +322,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         for (var i=0; i<rows.length; i++) {
           var row = rows[i];
           var o = leads[row.gsx$tl.$t] || (leads[row.gsx$tl.$t] = {});
-          var m = o[row.gsx$proposedmaintainer.$t] || (o[row.gsx$proposedmaintainer.$t] = []);
-          m.push({name: row.gsx$element.$t});
+          var m = o[row.gsx$maintainer.$t] || (o[row.gsx$maintainer.$t] = []);
+          m.push({name: row.gsx$tool.$t, organization: row.gsx$organization.$t});
         }
         this._leads = leads;
         if (rows.length > 0) {
@@ -338,6 +344,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
                 mr.repos = mr.repos.concat(leads[lead][maint]);
                 for (i=0; i<mr.repos.length; i++) {
                   requestQueue.push({
+                    organization: mr.repos[i].organization,
                     name: mr.repos[i].name,
                     path: ['all', 'leads', leadRepos.length-1, 'maintainers', or.maintainers.length-1, 'repos', i],
                   });
@@ -355,7 +362,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       _requestUntriaged: function() {
         var repo = this._requestQueue[0];
         if (repo) {
-          var name = 'polymerelements/' + repo.name;
+          var name = repo.organization + '/' + repo.name;
           var base = repo.next || 'https://api.github.com/repos/' + name + '/issues?state=open';
           var url = base + '&access_token=' + this.githubUser.github.accessToken;
           var xhr = new XMLHttpRequest();
@@ -391,10 +398,11 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         } else {
           var response = JSON.parse(xhr.responseText);
           this._filterAndAdd(response, null, false, false, repo.path, 'all');
-          this._filterAndAdd(response, /^p\d/i, true, false, repo.path, 'untriaged');
-          this._filterAndAdd(response, /^p0/i, false, false, repo.path, 'p0');
-          this._filterAndAdd(response, /^p1/i, false, false, repo.path, 'p1');
-          this._filterAndAdd(response, /^p2/i, false, false, repo.path, 'p2');
+          this._filterAndAdd(response, /^Priority:\d/i, true, false, repo.path, 'untriaged');
+          this._filterAndAdd(response, /^Priority: Critical/i, false, false, repo.path, 'p0');
+          this._filterAndAdd(response, /^Priority: High/i, false, false, repo.path, 'p1');
+          this._filterAndAdd(response, /^Priority: Medium/i, false, false, repo.path, 'p2');
+          this._filterAndAdd(response, /^Priority: Low/i, false, false, repo.path, 'p3');
           this._filterAndAdd(response, null, false, true, repo.path, 'prs');
           var link = xhr.getResponseHeader('Link');
           var matches = link && link.match(/<([^>]*)>; rel="next"/);
@@ -502,6 +510,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       <div class="count p0">{{lead.p0.length}}</div>
       <div class="count p1">{{lead.p1.length}}</div>
       <div class="count p2">{{lead.p2.length}}</div>
+      <div class="count p3">{{lead.p3.length}}</div>
       <div class="count pr">{{lead.prs.length}}</div>
     </div>
     <iron-collapse opened="{{lead.detailsOpen}}">
@@ -553,14 +562,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     <iron-collapse opened="{{maintainer.detailsOpen}}">
       <template is="dom-repeat" items="{{maintainer.repos}}">
         <div class="row repo">
-          <div class="name "><a target="_blank" href="https://github.com/polymerelements/{{item.name}}">{{item.name}}</a></div>
-          <div class="count"><a target="_blank" href="https://github.com/polymerelements/{{item.name}}/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+-label%3A%22p0+-+critical%22++-label%3A%22p1+-+backlog%22++-label%3A%22p2+-+icebox%22+">
+          <div class="name "><a target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}">{{item.name}}</a></div>
+          <div class="count"><a target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+-label%3A%22p0+-+critical%22++-label%3A%22p1+-+backlog%22++-label%3A%22p2+-+icebox%22+">
             {{item.untriaged.length}}</a></div>
-          <div class="count"><a class="p0" target="_blank" href="https://github.com/polymerelements/{{item.name}}/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22p0+-+critical%22">{{item.p0.length}}</a></div>
-          <div class="count"><a class="p1" target="_blank" href="https://github.com/polymerelements/{{item.name}}/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22p1+-+backlog%22">{{item.p1.length}}</a></div>
-          <div class="count"><a class="p2" target="_blank" href="https://github.com/polymerelements/{{item.name}}/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22p2+-+icebox%22">{{item.p2.length}}</a></div>
-          <div class="count"><a class="pr" target="_blank" href="https://github.com/polymerelements/{{item.name}}/pulls?utf8=%E2%9C%93&q=is%3Apr+is%3Aopen">{{item.prs.length}}</a></div>
-          <div class="count"><a target="_blank" href="https://travis-ci.org/PolymerElements/{{item.name}}"><img src="https://travis-ci.org/PolymerElements/{{item.name}}.svg?branch=master"></a></div>
+          <div class="count"><a class="p0" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22p0+-+critical%22">{{item.p0.length}}</a></div>
+          <div class="count"><a class="p1" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22p1+-+backlog%22">{{item.p1.length}}</a></div>
+          <div class="count"><a class="p2" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22p2+-+icebox%22">{{item.p2.length}}</a></div>
+          <div class="count"><a class="p3" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/issues?utf8=%E2%9C%93&q=is%3Aissue+is%3Aopen+label%3A%22p2+-+icebox%22">{{item.p3.length}}</a></div>
+          <div class="count"><a class="pr" target="_blank" href="https://github.com/{{item.organization}}/{{item.name}}/pulls?utf8=%E2%9C%93&q=is%3Apr+is%3Aopen">{{item.prs.length}}</a></div>
+          <div class="count"><a target="_blank" href="https://travis-ci.org/{{item.organization}}/{{item.name}}"><img src="https://travis-ci.org/{{item.organization}}/{{item.name}}.svg?branch=master"></a></div>
         </div>
       </template>
     </iron-collapse>
